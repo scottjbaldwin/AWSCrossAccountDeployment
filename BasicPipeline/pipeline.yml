@@ -197,6 +197,12 @@ Resources:
                   - 'kms:ListAliases'
                 Effect: Allow
                 Resource: '*'
+              - Action:
+                  - 'codestar-connections:UseConnection'
+                Effect: Allow
+                Resource:
+                  - !Ref CodeStarConnectionArn
+                  
       Tags:
         - Key: Project
           Value: !Ref ProjectName
