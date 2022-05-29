@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: CovidSafe Example application pipeline
+Description: Cross Account Basic Pipeline
 
 Parameters:
   ProjectName:
