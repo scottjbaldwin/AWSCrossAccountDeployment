@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy S3 bucket for Example Application
+Parameters:
+  ProjectName:
+    Type: String
+    Default: cross-account
+    Description: Name for the Project (NB must be lowercase)
+  Environment:
+    Type: String
+    Description: "The name of the environment NOTE: Must be lower case e.g. dev as it is used to prefix an S3 bucket name"
+Resources:
+  ApplicationBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${ProjectName}-${Environment}-application-bucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+        - Id: Purge after 7 days of creation
+          ExpirationInDays: 7
+          Status: Enabled
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
