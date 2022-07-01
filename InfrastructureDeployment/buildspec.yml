@@ -1,0 +1,21 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      # log the environment variables we care about
+      - printenv
+
+      # Upgrade apt
+      - apt-get upgrade
+      # Update libs
+      - apt-get update
+
+  build:
+    commands:
+      # get the account and identity details for the current context
+      - aws sts get-caller-identity --output text
+
+  artifacts:
+    files:
+      - src/ApplicationInfrastructure.yml
+    discard-paths: yes
