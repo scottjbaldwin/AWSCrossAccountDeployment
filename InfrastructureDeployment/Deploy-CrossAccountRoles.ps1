@@ -6,15 +6,11 @@ param(
 
     [Parameter(Mandatory=$true)]
     [string]
-    $DevAccountNo,
+    $BuildAccountNo,
 
     [Parameter(Mandatory=$true)]
     [string]
-    $ProdAccountNo,
-
-    [Parameter(Mandatory=$true)]
-    [string]
-    $CodeStarConnectionArn,
+    $ArtefactKMSKeyArn,
 
     [Parameter()]
     [string]
@@ -25,16 +21,16 @@ param(
     $AwsProfile = $env:aws_profile
 )
 
-$cfnPath = Join-Path $PSScriptRoot "pipeline.yml"
+$cfnPath = Join-Path $PSScriptRoot "CrossAccountRoles.yml"
 
 write-verbose "deploying cloudformation template $cfnPath"
 aws cloudformation deploy `
     --template-file $cfnPath `
     --s3-bucket $BucketName `
-    --s3-prefix "cross-account" `
-    --stack-name "basic-pipeline" `
+    --s3-prefix "cross-roles" `
+    --stack-name "infrastructure-pipeline-roles" `
     --capabilities CAPABILITY_NAMED_IAM `
     --region $Region `
     --no-fail-on-empty-changeset `
-    --parameter-overrides DevAccountNo=$DevAccountNo ProdAccountNo=$ProdAccountNo  CodeStarConnectionArn=$CodeStarConnectionArn `
+    --parameter-overrides BuildAccountNo=$BuildAccountNo ArtefactKMSKeyArn=$ArtefactKMSKeyArn `
     --profile $AwsProfile

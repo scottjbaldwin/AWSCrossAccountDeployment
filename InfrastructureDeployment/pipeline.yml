@@ -4,7 +4,7 @@ Description: Cross Account Infrastructure Deployment Pipeline
 Parameters:
   ProjectName:
     Type: String
-    Default: cross-account
+    Default: cross-account-infrastructure
     Description: Name for the Project (NB must be lowercase)
   DevAccountNo:
     Type: String
@@ -262,3 +262,29 @@ Resources:
                   OutputArtifacts:
                     - Name: OutputArtefact
                   RunOrder: 1
+            - Name: DeployToDev
+              Actions:
+                - Name: DeployS3Bucket
+                  RoleArn: !Sub 'arn:aws:iam::${DevAccountNo}:${AWS::Region}-DeploymentRole'
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Provider: CloudFormation
+                    Version: '1'
+                  RunOrder: 1
+                  Configuration:
+                    ActionMode: CREATE_UPDATE
+                    StackName: !Sub '${ProjectName}-S3-AppStack'
+            - Name: DeployToProd
+              Actions:
+                - Name: DeployS3Bucket
+                  RoleArn: !Sub 'arn:aws:iam::${ProdAccountNo}:${AWS::Region}-DeploymentRole'
+                  ActionTypeId:
+                    Category: Deploy
+                    Owner: AWS
+                    Provider: CloudFormation
+                    Version: '1'
+                  RunOrder: 1
+                  Configuration:
+                    ActionMode: CREATE_UPDATE
+                    StackName: !Sub '${ProjectName}-S3-AppStack'
