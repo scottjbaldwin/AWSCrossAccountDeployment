@@ -22,7 +22,7 @@ param(
 
     [Parameter()]
     [string]
-    $AwsProfile = $env:aws_profile
+    $AwsProfile = $env:AWS_PROFILE
 )
 
 $cfnPath = Join-Path $PSScriptRoot "pipeline.yml"

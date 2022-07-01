@@ -22,7 +22,7 @@ param(
 
     [Parameter()]
     [string]
-    $AwsProfile = $env:aws_profile
+    $AwsProfile = $env:AWS_PROFILE
 )
 
 $cfnPath = Join-Path $PSScriptRoot "pipeline.yml"
@@ -31,8 +31,8 @@ write-verbose "deploying cloudformation template $cfnPath"
 aws cloudformation deploy `
     --template-file $cfnPath `
     --s3-bucket $BucketName `
-    --s3-prefix "cross-account" `
-    --stack-name "basic-pipeline" `
+    --s3-prefix "cross-account-infrastructure" `
+    --stack-name "cross-account-infrastructure-pipeline" `
     --capabilities CAPABILITY_NAMED_IAM `
     --region $Region `
     --no-fail-on-empty-changeset `
