@@ -18,6 +18,10 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: The codestar connection used to connect to github
+  BranchName:
+    Type: String
+    Description: The name of the branch to trigger the pipeline from
+    Default: "pipeline/basic"
   SourceRepository:
     Type: String
     Description: The Fully qualified repository name
@@ -243,7 +247,7 @@ Resources:
                     ConnectionArn: !Ref CodeStarConnectionArn
                     FullRepositoryId: !Ref SourceRepository
                     DetectChanges: true
-                    BranchName: main
+                    BranchName: !Ref BranchName
                   OutputArtifacts:
                     - Name: SourceArtefact
                   RunOrder: 1
