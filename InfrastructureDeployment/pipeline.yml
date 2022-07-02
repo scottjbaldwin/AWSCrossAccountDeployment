@@ -292,8 +292,15 @@ Resources:
                     Version: '1'
                   RunOrder: 1
                   Configuration:
+                    RoleArn: !Sub 'arn:aws:iam::${DevAccountNo}:role/${ProjectName}-${PipelineName}-${AWS::Region}-DeploymentRole'
                     ActionMode: CREATE_UPDATE
                     StackName: !Sub '${ProjectName}-${PipelineName}-AppStack'
+                    TemplatePath: OutputArtefact::ApplicationInfrastructure.yml
+                    ParameterOverrides: !Sub |
+                      {
+                          "Environment" : "dev",
+                          "PipelineName" : ${PipelineName}
+                      }
             - Name: DeployToProd
               Actions:
                 - Name: DeployS3Bucket
@@ -305,5 +312,12 @@ Resources:
                     Version: '1'
                   RunOrder: 1
                   Configuration:
+                    RoleArn: !Sub 'arn:aws:iam::${ProdAccountNo}:role/${ProjectName}-${PipelineName}-${AWS::Region}-DeploymentRole'
                     ActionMode: CREATE_UPDATE
                     StackName: !Sub '${ProjectName}-${PipelineName}-AppStack'
+                    TemplatePath: OutputArtefact::ApplicationInfrastructure.yml
+                    ParameterOverrides: !Sub |
+                      {
+                          "Environment" : "prod",
+                          "PipelineName" : ${PipelineName}
+                      }

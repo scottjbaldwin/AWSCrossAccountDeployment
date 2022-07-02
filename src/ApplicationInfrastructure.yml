@@ -5,6 +5,9 @@ Parameters:
     Type: String
     Default: cross-account
     Description: Name for the Project (NB must be lowercase)
+  PipelineName:
+    Type: String
+    Description: The name of the pipeline to distinguish it from others
   Environment:
     Type: String
     Description: "The name of the environment NOTE: Must be lower case e.g. dev as it is used to prefix an S3 bucket name"
@@ -12,7 +15,7 @@ Resources:
   ApplicationBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${ProjectName}-${Environment}-application-bucket
+      BucketName: !Sub ${ProjectName}-${PipelineName}-${Environment}-application-bucket
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
