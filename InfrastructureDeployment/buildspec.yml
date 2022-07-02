@@ -15,7 +15,7 @@ phases:
       # get the account and identity details for the current context
       - aws sts get-caller-identity --output text
 
-  artifacts:
-    files:
-      - src/ApplicationInfrastructure.yml
-    discard-paths: yes
+artifacts:
+  files:
+    - src/ApplicationInfrastructure.yml
+  discard-paths: yes
