@@ -4,7 +4,11 @@ Parameters:
   ProjectName:
     Type: String
     Description: Name for the Project
-    Default: cross-account-infrastructure
+    Default: cross-account
+  PipelineName:
+    Type: String
+    Description: The name given to the pipeline
+    Default: infrastructure
   BuildAccountNo:
     Type: String
     Description: The ARN of the build account that will use this role to deploy the application
@@ -31,7 +35,7 @@ Resources:
               AWS:
                 - !Sub 'arn:aws:iam::${BuildAccountNo}:root'
             Action: sts:AssumeRole
-      RoleName: !Sub '${ProjectName}-${AWS::Region}-DeploymentRole'
+      RoleName: !Sub '${ProjectName}-${PipelineName}-${AWS::Region}-DeploymentRole'
       Policies:
         - PolicyName: Allow-Application-Infrastructure-Provisioning
           PolicyDocument:

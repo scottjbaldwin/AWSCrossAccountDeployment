@@ -6,9 +6,13 @@ Parameters:
     Type: String
     Default: cross-account
     Description: Name for the Project (NB must be lowercase)
+  PipelineName:
+    Type: String
+    Description: The name given to the pipeline
+    Default: basic
   DevAccountNo:
     Type: String
-    Description: The Account Number of the dev account
+    Description: The AccountNumber of the dev account
   ProdAccountNo:
     Type: String
     Description: The Account Number of the prod account
@@ -18,10 +22,6 @@ Parameters:
   CodeStarConnectionArn:
     Type: String
     Description: The codestar connection used to connect to github
-  BranchName:
-    Type: String
-    Description: The name of the branch to trigger the pipeline from
-    Default: "pipeline/basic"
   SourceRepository:
     Type: String
     Description: The Fully qualified repository name
@@ -31,7 +31,7 @@ Resources:
   ArtefactBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${ProjectName}-artefactbucket
+      BucketName: !Sub ${ProjectName}-${PipelineName}-artefactbucket
       BucketEncryption: 
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -52,6 +52,8 @@ Resources:
       Tags:
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Pipeline
+          Value: !Ref PipelineName
 
   ArtefactBucketPolicy: 
     Type: AWS::S3::BucketPolicy
@@ -66,7 +68,7 @@ Resources:
                 - codebuild.amazonaws.com
                 - codepipeline.amazonaws.com
             Action: 's3:*'
-            Resource: !Sub 'arn:aws:s3:::${ProjectName}-artefactbucket'
+            Resource: !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket'
           - Sid: AllowTargetAccountsAccessS3
             Effect: Allow
             Principal:
@@ -75,8 +77,8 @@ Resources:
                 - !Sub 'arn:aws:iam::${ProdAccountNo}:root'
             Action: 's3:*'
             Resource: 
-              - !Sub 'arn:aws:s3:::${ProjectName}-artefactbucket/*'
-              - !Sub 'arn:aws:s3:::${ProjectName}-artefactbucket'
+              - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*'
+              - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket'
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -98,18 +100,18 @@ Resources:
             Statement:
               - Effect: Allow
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}_build'
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}_build:*'
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-${PipelineName}_build'
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-${PipelineName}_build:*'
                 Action:
                   - 'logs:CreateLogGroup'
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
               - Effect: Allow
-                Resource: !Sub "arn:aws:s3:::${ProjectName}-artefactbucket/*"
+                Resource: !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*"
                 Action: 
                   - s3:*
               - Effect: Allow
-                Resource: !Sub "arn:aws:s3:::${ProjectName}-artefactbucket"
+                Resource: !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket"
                 Action: 
                   - s3:*
               - Effect: Allow
@@ -140,7 +142,7 @@ Resources:
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: !Sub '${ProjectName}_build'
+      Name: !Sub '${ProjectName}-${PipelineName}_build'
       Description: Builds the backend services and creates a cloudformation template to deploy them
       Artifacts:
         Type: CODEPIPELINE
@@ -150,7 +152,7 @@ Resources:
         Image: !Sub '${CodeBuildEnvironment}'
         EnvironmentVariables:
           - Name: BUILD_OUTPUT_BUCKET
-            Value: !Sub ${ProjectName}-artefactbucket
+            Value: !Sub ${ProjectName}-${PipelineName}-artefactbucket
           - Name: AWS_REGION
             Value: !Sub ${AWS::Region}
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
@@ -160,6 +162,8 @@ Resources:
       Tags:
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Pipeline
+          Value: !Ref PipelineName
 
   PipelineExecutionRole:
     Type: AWS::IAM::Role
@@ -217,6 +221,8 @@ Resources:
       Tags:
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Pipeline
+          Value: !Ref PipelineName
 
   Pipeline:
       Type: AWS::CodePipeline::Pipeline
@@ -224,15 +230,17 @@ Resources:
         Tags:
           - Key: Project
             Value: !Ref ProjectName
+          - Key: Pipeline
+            Value: !Ref PipelineName
         ArtifactStore: 
-            Location: !Sub ${ProjectName}-artefactbucket
+            Location: !Sub ${ProjectName}-${PipelineName}-artefactbucket
             Type: S3
             EncryptionKey:
               Id: 
                 Fn::ImportValue:
                   !Sub '${ProjectName}:ArtefactKMSKey'
               Type: KMS
-        Name: !Sub ${ProjectName}_pipeline
+        Name: !Sub ${ProjectName}-${PipelineName}_pipeline
         RoleArn: !GetAtt PipelineExecutionRole.Arn
         Stages:
             - Name: Source
@@ -247,7 +255,7 @@ Resources:
                     ConnectionArn: !Ref CodeStarConnectionArn
                     FullRepositoryId: !Ref SourceRepository
                     DetectChanges: true
-                    BranchName: !Ref BranchName
+                    BranchName: !Sub "pipeline/${PipelineName}"
                   OutputArtifacts:
                     - Name: SourceArtefact
                   RunOrder: 1
