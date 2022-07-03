@@ -43,7 +43,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: s3:*
-                Resource: '*'
+                Resource: 
+                  - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket'
+                  - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*'
               - Effect: Allow
                 Action: cloudformation:*
                 Resource: '*'

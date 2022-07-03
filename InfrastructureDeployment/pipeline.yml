@@ -68,7 +68,9 @@ Resources:
                 - codebuild.amazonaws.com
                 - codepipeline.amazonaws.com
             Action: 's3:*'
-            Resource: !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket'
+            Resource: 
+              - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket'
+              - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*'
           - Sid: AllowTargetAccountsAccessS3
             Effect: Allow
             Principal:
