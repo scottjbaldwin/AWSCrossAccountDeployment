@@ -12,6 +12,10 @@ param(
     [string]
     $ArtefactKMSKeyArn,
 
+    [Parameter(Mandatory=$true)]
+    [string]
+    $Environment,
+
     [Parameter()]
     [string]
     $Region = "ap-southeast-2",
@@ -32,5 +36,5 @@ aws cloudformation deploy `
     --capabilities CAPABILITY_NAMED_IAM `
     --region $Region `
     --no-fail-on-empty-changeset `
-    --parameter-overrides BuildAccountNo=$BuildAccountNo ArtefactKMSKeyArn=$ArtefactKMSKeyArn `
+    --parameter-overrides BuildAccountNo=$BuildAccountNo ArtefactKMSKeyArn=$ArtefactKMSKeyArn Environment=$Environment `
     --profile $AwsProfile

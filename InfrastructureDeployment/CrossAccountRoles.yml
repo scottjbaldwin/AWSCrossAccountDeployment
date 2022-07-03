@@ -9,6 +9,9 @@ Parameters:
     Type: String
     Description: The name given to the pipeline
     Default: infrastructure
+  Environment:
+    Type: String
+    Description: The name of the environment you are deploying to
   BuildAccountNo:
     Type: String
     Description: The ARN of the build account that will use this role to deploy the application
@@ -49,6 +52,8 @@ Resources:
                 Resource: 
                   - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket'
                   - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*'
+                  - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-${Environment}-application-bucket'
+                  - !Sub 'arn:aws:s3:::${ProjectName}-${PipelineName}-${Environment}-application-bucket/*'
               - Effect: Allow
                 Action: cloudformation:*
                 Resource: '*'
