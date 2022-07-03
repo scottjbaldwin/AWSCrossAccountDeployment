@@ -56,11 +56,16 @@ Resources:
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              Effect: Allow
-              Action: 
-                - kms:Encrypt
-                - kms:Decrypt
-                - kms:ReEncrypt*
-                - kms:GenerateDataKey*
-                - kms:DescribeKey
-              Resource: !Ref ArtefactKMSKeyArn
+              - Effect: Allow
+                Action: 
+                  - kms:Encrypt
+                  - kms:Decrypt
+                  - kms:ReEncrypt*
+                  - kms:GenerateDataKey*
+                  - kms:DescribeKey
+                Resource: !Ref ArtefactKMSKeyArn
+              - Effect: Allow
+                Action:
+                  - 'kms:ListKeys'
+                  - 'kms:ListAliases'
+                Resource: '*'
