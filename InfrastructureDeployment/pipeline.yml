@@ -109,13 +109,11 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
               - Effect: Allow
-                Resource: !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*"
                 Action: 
                   - s3:*
-              - Effect: Allow
-                Resource: !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket"
-                Action: 
-                  - s3:*
+                Resource: 
+                  - !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*"
+                  - !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket"
               - Effect: Allow
                 Action:
                   - 'codebuild:*'
@@ -182,14 +180,17 @@ Resources:
               Service: 
                 - codepipeline.amazonaws.com
       Path: /
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/AWSCodeCommitFullAccess'
-        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
       Policies:
         - PolicyName: CodePipelineAccess
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
+              - Effect: Allow
+                Action: 
+                  - s3:*
+                Resource: 
+                  - !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket/*"
+                  - !Sub "arn:aws:s3:::${ProjectName}-${PipelineName}-artefactbucket"
               - Action:
                   - 'iam:PassRole'
                 Effect: Allow
@@ -303,6 +304,8 @@ Resources:
                           "Environment" : "dev",
                           "PipelineName" : ${PipelineName}
                       }
+                  InputArtifacts:
+                    - Name: OutputArtefact
             - Name: DeployToProd
               Actions:
                 - Name: DeployS3Bucket
@@ -323,3 +326,5 @@ Resources:
                           "Environment" : "prod",
                           "PipelineName" : ${PipelineName}
                       }
+                  InputArtifacts:
+                    - Name: OutputArtefact
