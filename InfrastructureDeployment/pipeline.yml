@@ -302,7 +302,7 @@ Resources:
                     ParameterOverrides: !Sub |
                       {
                           "Environment" : "dev",
-                          "PipelineName" : ${PipelineName}
+                          "PipelineName" : "${PipelineName}"
                       }
                   InputArtifacts:
                     - Name: OutputArtefact
@@ -324,7 +324,7 @@ Resources:
                     ParameterOverrides: !Sub |
                       {
                           "Environment" : "prod",
-                          "PipelineName" : ${PipelineName}
+                          "PipelineName" : "${PipelineName}"
                       }
                   InputArtifacts:
                     - Name: OutputArtefact
